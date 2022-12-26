@@ -1,13 +1,17 @@
 package dto;
 
+import java.util.ArrayList;
+
 public class Post {
 	private String uuid;
+	private String member_uuid;
 	private String member_id;
 	private String content;
 	private String regdate;
 	private String editdate;
 	private int likes;
 	private int comments;
+	private ArrayList<String> images;
 
 	
 	public String getUuid() {
@@ -15,6 +19,12 @@ public class Post {
 	}
 	public void setUuid(String uuid) {
 		this.uuid = uuid;
+	}
+	public String getMember_uuid() {
+		return member_uuid;
+	}
+	public void setMember_uuid(String member_uuid) {
+		this.member_uuid = member_uuid;
 	}
 	public String getMember_id() {
 		return member_id;
@@ -51,5 +61,11 @@ public class Post {
 	}
 	public void setComments(int comments) {
 		this.comments = comments;
+	}
+	public ArrayList<String> getImages() {
+		return images;
+	}
+	public void setImages(ArrayList<String> images) {
+		this.images = images;
 	}
 }

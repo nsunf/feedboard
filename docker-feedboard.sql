@@ -113,7 +113,7 @@ insert into comments values (
     '67413ad0-2028-42c2-94a2-2d04a9819639',
     '770636bc-a1d1-4b30-8144-8b35d290e2f1',
     '54c453ad-347a-4c47-b069-d64031c80131',
-    'Nullam odio lacus, porttitor rutrum arcu vitae, eleifend dapibus sem.',
+    'In porta vulputate massa eu interdum. Donec eget viverra lectus, eget eleifend neque.',
     to_date('2022/12/15/09:27:00', 'YYYY/MM/DD/HH24:MI:SS'),
     null
 );
@@ -186,8 +186,8 @@ select
     c.member_uuid, 
     m.member_id, 
     c.comment_content,
-    to_char(c.comment_regdate, 'YYYY/MM/DD HH24:MI:SS'),
-    to_char(c.comment_editdate, 'YYYY/MM/DD HH24:MI:SS')
+    to_char(c.comment_regdate, 'YYYY/MM/DD HH24:MI:SS') as regdate,
+    to_char(c.comment_editdate, 'YYYY/MM/DD HH24:MI:SS') as editdate
 from comments c
 join members m
 on c.member_uuid = m.member_uuid;
@@ -200,7 +200,7 @@ select
     m.member_id,
     p.post_content,
     p.post_regdate,
-    count(l.member_uuid) over(partition by p.post_id)
+    count(l.member_uuid) over(partition by p.post_id) as likes
 from posts p
 join members m
 on p.member_uuid = m.member_uuid
@@ -228,17 +228,45 @@ order by regdate desc;
 
 select p.post_id, count(c.comment_id) from posts p left join comments c on p.post_id = c.post_id group by p.post_id;
 
-select
-    mm.post_id, mm.member_uuid, mm.member_id, mm.post_content, mm.regdate, mm.editdate, c.post_id,
-    count(l.member_uuid) as likes_cnt
-    --count(c.comment_id) as comm_cnt
-from (select p.post_id, m.member_uuid, m.member_id, p.post_content, to_char(p.post_regdate, 'YYYY/MM/DD HH:mm') as regdate, to_char(p.post_editdate, 'YYYY/MM/DD HH:mm') as editdate from posts p left join members m on p.member_uuid = m.member_uuid) mm
-left join likes l
-on mm.post_id = l.post_id
-left join comments c
-on mm.post_id = c.post_id
-group by (mm.post_id, mm.member_uuid, mm.member_id, mm.post_content, mm.regdate, mm.editdate, c.post_id)
-;
+--
+
+--
+create or replace view posts_info as 
+    select
+        p.post_id,
+        m.member_uuid as author_uuid,
+        m.member_id as author_id,
+        p.post_content,
+        p.post_regdate,
+        p.post_editdate,
+        count(l.member_uuid) as likes
+    from posts p 
+        left join members m
+        on p.member_uuid = m.member_uuid
+        left join likes l
+        on p.post_id = l.post_id
+        group by (p.post_id, m.member_uuid, m.member_id, p.post_content, p.post_regdate, p.post_editdate)
+        order by p.post_regdate asc;
+--
+select 
+    a.post_id, 
+    a.author_uuid, 
+    a.author_id, 
+    a.post_content, 
+    a.post_regdate, 
+    a.post_editdate, 
+    a.likes, 
+    (select i.image_id||i.image_ext as file_name from posts p left join images i on p.post_id = i.post_id where p.post_id = a.post_id and i.image_order = 1) as img1,
+    (select i.image_id||i.image_ext as file_name from posts p left join images i on p.post_id = i.post_id where p.post_id = a.post_id and i.image_order = 2) as img2,
+    count(c.post_id)
+from posts_info a
+left join comments c 
+on a.post_id = c.post_id
+group by (a.post_id, a.author_uuid, a.author_id, a.post_content, a.post_regdate, a.post_editdate, a.likes);
+--
+
+select i.image_id||i.image_ext as file_name from posts p left join images i on p.post_id = i.post_id where p.post_id = '9642ed0d-86df-4ae2-8b62-63a85525ad18' and i.image_order = 1 ;
+
 delete from posts;
 delete from comments;
 delete from likes;

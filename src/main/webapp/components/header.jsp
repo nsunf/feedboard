@@ -11,7 +11,7 @@
 		<div class="header__wrap">
 			<div class="header__logo logo">
 				<h1 class="logo__text">
-					<a class="logo__link" href="/">FeedBoard</a>
+					<a class="logo__link" href="/FeedBoard">FeedBoard</a>
 				</h1>
 			</div>
 			<div class="header__search search">

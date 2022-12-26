@@ -129,6 +129,7 @@ section {
 	display: flex;
 	flex-direction: row;
 	justify-content: space-between;
+	gap: 20px;
 	
 	position: relative;
 }
@@ -335,20 +336,27 @@ section {
 }
 
 .profile__edit {
-	background: var(--main-color);
 	width: 16px;
 	height: 16px;
 	border-radius: 50%;
+	
+	display: flex;
+	justify-content: center;
+	align-items: center;
 	
 	position: absolute;
 	right: 4px;
 	bottom: 8px;
 
 	font-weight: bold;
-	line-height: 16px;
 	text-align: center;
 
 	color: white;
+	background: var(--main-color);
+}
+
+.profile__edit .add-icon {
+	font-size: 0.75rem;
 }
 
 .profile__info {
@@ -387,7 +395,6 @@ section {
 	background: var(--input-color); 
 	border-radius: 4px;
 }
-
 
 .form__input-box label {
 	width: 72px;

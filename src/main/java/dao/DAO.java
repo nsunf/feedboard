@@ -13,8 +13,8 @@ public class DAO {
 	public static Connection getConnection() {
 		try {
 			Class.forName("oracle.jdbc.driver.OracleDriver");
-			String url = "jdbc:oracle:thin:@localhost:1521/xe";
-			conn = DriverManager.getConnection(url, "feedboard", "test1234");
+			String url = "jdbc:oracle:thin:@localhost:1521:xe";
+			conn = DriverManager.getConnection(url, "feedboard", "sys1234");
 		} catch (Exception e) {
 			System.out.println("===> DAO.getConnection()");
 			e.printStackTrace();
