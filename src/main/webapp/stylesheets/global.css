@@ -128,7 +128,7 @@ section {
 	
 	display: flex;
 	flex-direction: row;
-	justify-content: space-between;
+	justify-content: center;
 	gap: 20px;
 	
 	position: relative;
@@ -366,6 +366,20 @@ section {
 .profile__id {
 	font-size: 1.2rem;
 	font-weight: bold;
+}
+
+.profile__log-out {
+	flex-grow: 1;
+	position: relative;
+	height: 100%;
+}
+
+.profile__log-out a {
+	position: absolute;
+	bottom: 0;
+	right: 0;
+	color: var(--main-color);
+	text-decoration: underline;
 }
 
 .aside__login, .aside__signup {

@@ -266,6 +266,21 @@ group by (a.post_id, a.author_uuid, a.author_id, a.post_content, a.post_regdate,
 --
 
 select i.image_id||i.image_ext as file_name from posts p left join images i on p.post_id = i.post_id where p.post_id = '9642ed0d-86df-4ae2-8b62-63a85525ad18' and i.image_order = 1 ;
+-- member info
+select 
+    m.member_uuid,
+    m.member_id,
+    m.member_name,
+    count(p.post_id),
+    substr(m.member_ssn, 1, 6) as birth,
+    m.member_phone,
+    m.member_regdate,
+    m.member_image
+from members m
+left join posts p
+on m.member_uuid = p.member_uuid
+where m.member_id = 'user1234' and m.member_pw = 'sys1234'
+group by (m.member_uuid, m.member_id, m.member_name, substr(m.member_ssn, 1, 6), m.member_phone, m.member_regdate, m.member_image);
 
 delete from posts;
 delete from comments;

@@ -5,10 +5,11 @@ public class Member {
 	private String id;
 	private String name;
 	private int numOfPost;
+	private String ssn;
 	private String birth;
+	private String pw;
 	private String phone;
 	private String regDate;
-	private String editDate;
 	private String imgurl;
 	
 
@@ -36,11 +37,23 @@ public class Member {
 	public void setNumOfPost(int numOfPost) {
 		this.numOfPost = numOfPost;
 	}
+	public String getSsn() {
+		return ssn;
+	}
+	public void setSsn(String ssn) {
+		this.ssn = ssn;
+	}
 	public String getBirth() {
 		return birth;
 	}
 	public void setBirth(String birth) {
 		this.birth = birth;
+	}
+	public String getPw() {
+		return pw;
+	}
+	public void setPw(String pw) {
+		this.pw = pw;
 	}
 	public String getPhone() {
 		return phone;
@@ -53,12 +66,6 @@ public class Member {
 	}
 	public void setRegDate(String regDate) {
 		this.regDate = regDate;
-	}
-	public String getEditDate() {
-		return editDate;
-	}
-	public void setEditDate(String editDate) {
-		this.editDate = editDate;
 	}
 	public String getImgurl() {
 		return imgurl;
