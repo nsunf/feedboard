@@ -23,6 +23,7 @@ create table posts (
     post_content varchar2(4000),
     post_regdate date default sysdate not null,
     post_editdate date,
+    img_url varchar2(50) 
     constraint fk_posts_member foreign key (member_uuid) references members(member_uuid)
 );
 
@@ -30,7 +31,7 @@ create table comments (
     comment_id char(36) primary key,
     post_id char(36) not null,
     member_uuid char(36) not null,
-    comment_content long,
+    comment_content varchar2(1500),
     comment_regdate date default sysdate not null,
     comment_editdate date,
     constraint fk_comments_post foreign key (post_id) references posts(post_id),
@@ -265,7 +266,8 @@ on a.post_id = c.post_id
 group by (a.post_id, a.author_uuid, a.author_id, a.post_content, a.post_regdate, a.post_editdate, a.likes);
 --
 
-select i.image_id||i.image_ext as file_name from posts p left join images i on p.post_id = i.post_id where p.post_id = '9642ed0d-86df-4ae2-8b62-63a85525ad18' and i.image_order = 1 ;
+select i.image_id||i.image_ext as file_name from posts p join images i on p.post_id = i.post_id where p.post_id = '9642ed0d-86df-4ae2-8b62-63a85525ad18' and i.image_order = 1 ;
+select i.image_id||i.image_ext as file_name from posts p join images i on p.post_id = i.post_id where p.post_id = '770636bc-a1d1-4b30-8144-8b35d290e2f1' order by i.image_order;
 -- member info
 select 
     m.member_uuid,
@@ -281,7 +283,34 @@ left join posts p
 on m.member_uuid = p.member_uuid
 where m.member_id = 'user1234' and m.member_pw = 'sys1234'
 group by (m.member_uuid, m.member_id, m.member_name, substr(m.member_ssn, 1, 6), m.member_phone, m.member_regdate, m.member_image);
-
+-- post
+select
+    p.post_id,
+    p.author_uuid,
+    p.author_id,
+    p.post_content,
+    p.post_regdate,
+    p.post_editdate,
+    p.likes
+from posts_info p
+where p.post_id = '770636bc-a1d1-4b30-8144-8b35d290e2f1';
+-- comments
+select
+    p.post_id,
+    c.comment_id,
+    p.member_uuid as post_author_id,
+    c.member_uuid as comm_author_id,
+    m.member_id,
+    c.comment_content,
+    c.comment_regdate,
+    c.comment_editdate
+from comments c
+left join posts p
+on p.post_id = c.post_id
+left join members m
+on c.member_uuid = m.member_uuid
+where p.post_id = '770636bc-a1d1-4b30-8144-8b35d290e2f1';
+--
 delete from posts;
 delete from comments;
 delete from likes;

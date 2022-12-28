@@ -1,0 +1,88 @@
+@charset "UTF-8";
+
+.edit-box {
+	width: 680px;
+	margin: 20px 0;
+	padding: 16px;
+	background: white;
+	border-radius: 4px;
+	box-shadow: 0 2px 4px rgba(0, 0, 0, 0.25);
+	transition: 150ms;
+
+	display: flex;
+	flex-direction: column;
+	align-items: stretch;
+}
+
+.edit-box__top {
+}
+
+.edit-box__top h2 {
+	padding: 8px 0;
+}
+
+.edit-box__divider {
+	margin: 8px 0;
+}
+
+.editform {
+	display: flex;
+	flex-direction: column;
+	align-items: stretch;
+}
+
+.editform__image-label {
+	font-size: 1.2rem;
+	font-weight: 600;
+}
+
+.editform__images {
+	margin: 16px 0;
+}
+
+.editform__content {
+	resize: none;
+	height: 400px;
+	padding: 16px 32px;
+
+	border: none;
+	border-radius: 4px;
+	padding: 8px;
+
+	background: var(--input-color); 
+	outline: 2px solid transparent;
+	transition: 300ms;
+	margin-bottom: 16px;
+}
+
+.editform__content:focus {
+	outline: 2px solid var(--main-color);
+	box-shadow: 0px 0px 10px 8px rgba(60, 179, 217, 0.25);
+	transform: scale(1.002);
+}
+
+.editform__submit-btn {
+	width: 100%;
+	height: 40px;
+	font-size: 1.125rem;
+	font-weight: 600;
+
+	color: white;
+	background: var(--main-color);
+
+	margin: 0 auto;
+	border: none;
+	border-radius: 4px;
+	cursor: pointer;
+	
+	transition: 150ms;
+}
+
+.editform__submit-btn:hover, .editform__submit-btn:focus {
+	background: var(--main-darken);
+	transform: scale(1.002);
+}
+
+.editform__submit-btn:active {
+	background: var(--main-lighten);
+}

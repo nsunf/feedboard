@@ -3,12 +3,12 @@ package dto;
 public class Comment {
 	private String uuid;
 	private String post_id;
-	private String member_uuid;
-	private String member_id;
+	private String post_author_id;
+	private String comm_author_uuid;
+	private String comm_author_id;
 	private String content;
 	private String regDate;
 	private String editDate;
-
 	
 	public String getUuid() {
 		return uuid;
@@ -22,17 +22,23 @@ public class Comment {
 	public void setPost_id(String post_id) {
 		this.post_id = post_id;
 	}
-	public String getMember_uuid() {
-		return member_uuid;
+	public String getPost_author_id() {
+		return post_author_id;
 	}
-	public void setMember_uuid(String member_uuid) {
-		this.member_uuid = member_uuid;
+	public void setPost_author_id(String post_author_id) {
+		this.post_author_id = post_author_id;
 	}
-	public String getMember_id() {
-		return member_id;
+	public String getComm_author_uuid() {
+		return comm_author_uuid;
 	}
-	public void setMember_id(String member_id) {
-		this.member_id = member_id;
+	public void setComm_author_uuid(String comm_author_uuid) {
+		this.comm_author_uuid = comm_author_uuid;
+	}
+	public String getComm_author_id() {
+		return comm_author_id;
+	}
+	public void setComm_author_id(String comm_author_id) {
+		this.comm_author_id = comm_author_id;
 	}
 	public String getContent() {
 		return content;

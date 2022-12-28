@@ -1,0 +1,185 @@
+@charset "UTF-8";
+
+/* post */
+.post {
+	width: 680px;
+	margin: 20px 0;
+	padding: 16px;
+	background: white;
+	border-radius: 4px;
+	box-shadow: 0 2px 4px rgba(0, 0, 0, 0.25);
+	transition: 150ms;
+	cursor: pointer;
+}
+
+.post-detail {
+	margin-bottom: 8px;
+	cursor: initial;
+}
+
+.post:not(.no-post):not(.post-detail):hover {
+	transform: scale(1.0075);
+	box-shadow: 0px 2px 8px 2px rgba(0, 0, 0, 0.25);
+}
+
+.no-post__wrap {
+	height: 120px;
+	display: flex;
+	flex-direction: column;
+	justify-content: center;
+	align-items: center;
+	gap: 8px;
+}
+
+.no-post__text {
+	font-size: 1.2rem;
+	font-weight: bold;
+	color: var(--gray-text);
+}
+
+.no-post__icon {
+	font-size: 1.2rem;
+	color: var(--gray-text);
+}
+
+.post__header {
+	display: flex;
+	flex-direction: row;
+	justify-content: space-between;
+	align-items: center;
+
+	padding: 8px 16px;
+}
+
+.post__author:hover {
+	text-decoration: underline;
+}
+
+.post__author .author__link {
+	display: flex;
+	flex-direction: row;
+	align-items: center;
+	gap: 8px;
+}
+
+.post__author .author__img {
+	width: 40px;
+	height: 40px;
+	object-fit: cover;
+	border-radius: 50%;
+}
+
+.post__etc {
+	/*overflow: hidden;*/
+}
+
+.post__date {
+	float: left;
+	margin-right: 16px;
+	line-height: 32px;
+}
+
+.post__setting {
+	float: left;
+	cursor: pointer;
+	position: relative;
+}
+
+.post__setting .setting__icon {
+	width: 32px;
+	height: 32px;
+	line-height: 32px;
+	text-align: center;
+	transition: 150ms;
+}
+
+.post__setting .setting__icon:hover {
+	transform: scale(1.25);
+}
+
+.post__setting .setting__pop-up {
+	display: none;
+
+	position: absolute;
+	bottom: -72px;
+	right: 0;
+
+	border-radius: 2px;
+	background: white;
+	box-shadow: 2px 2px 4px 4px rgba(0, 0, 0, 0.25);
+}
+
+.post__setting .setting__button {
+	display: flex;
+	flex-direction: row;
+	justify-content: space-around;
+	align-items: stretch;
+	
+	width: 80px;
+	height: 32px;
+}
+
+.post__setting .setting__button:hover {
+	background: var(--gray);
+}
+
+.post__setting .setting__button span {
+	flex-basis: 56px;
+	line-height: 32px;
+}
+
+.post__setting .setting__button i {
+	line-height: 32px;
+}
+
+.post__divider {
+	margin: 8px 0;
+}
+
+
+.post__image {
+	width: 300px;
+	height: 300px;
+	object-fit: cover;
+}
+
+.post__main {
+	padding: 8px 16px;
+}
+
+.post__link {
+	
+}
+
+.post__content {
+	padding: 8px 0;
+}
+
+.post__footer {
+	overflow: hidden;
+	padding: 0 16px;
+}
+
+.post__likes {
+	float: left;
+}
+
+.likes__btn {
+	
+}
+
+.likes__btn--none {
+	display: none;
+}
+
+.likes__btn--selected {
+	color: #FF4B4B;
+}
+
+.post__comments {
+	float: left;
+	margin-left: 16px;
+}
+
+.comments__icon {
+}

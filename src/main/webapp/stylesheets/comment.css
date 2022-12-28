@@ -1,0 +1,170 @@
+@charset "UTF-8";
+
+.comment, .comment__form-box {
+	margin: 8px 0;
+	padding: 16px;
+	background: white;
+	border-radius: 4px;
+	box-shadow: 0 2px 4px rgba(0, 0, 0, 0.25);
+}
+
+.comment {
+	width: calc(680px - 80px);
+	margin-left: 80px;
+}
+
+.comment__form-box {
+	width: 680px;
+	margin-left: 0;
+}
+
+
+.comment__header {
+	display: flex;
+	flex-direction: row;
+	justify-content: space-between;
+	align-items: center;
+
+	padding: 0 16px;
+}
+
+.comment__author:hover {
+	text-decoration: underline;
+}
+
+.comment__author .author__link {
+	display: flex;
+	flex-direction: row;
+	align-items: center;
+	gap: 8px;
+	font-size: 0.9rem;
+}
+
+.comment__author .author__img {
+	width: 30px;
+	height: 30px;
+	object-fit: cover;
+	border-radius: 50%;
+}
+
+.comment__date {
+	float: left;
+	margin-right: 16px;
+	font-size: 0.8rem;
+	line-height: 32px;
+}
+
+.comment__setting {
+	float: left;
+	cursor: pointer;
+	position: relative;
+}
+
+.comment__setting .setting__icon {
+	width: 32px;
+	height: 32px;
+	line-height: 32px;
+	text-align: center;
+	transition: 150ms;
+}
+
+.comment__setting .setting__icon:hover {
+	transform: scale(1.25);
+}
+
+.comment__setting .setting__pop-up {
+	display: none;
+
+	position: absolute;
+	bottom: -72px;
+	right: 0;
+
+	border-radius: 2px;
+	background: white;
+	box-shadow: 2px 2px 4px 4px rgba(0, 0, 0, 0.25);
+}
+
+.comment__setting .setting__button {
+	display: flex;
+	flex-direction: row;
+	justify-content: space-around;
+	align-items: stretch;
+	
+	width: 80px;
+	height: 32px;
+}
+
+.comment__setting .setting__button:hover {
+	background: var(--gray);
+}
+
+.comment__setting .setting__button span {
+	flex-basis: 56px;
+	line-height: 32px;
+}
+
+.comment__setting .setting__button i {
+	line-height: 32px;
+}
+
+.comment__main {
+	padding: 8px 16px;
+}
+
+.comment__content {
+	padding-left: 32px;
+}
+
+.comment__form-box form {
+	width: 100%;
+	height: 100%;
+	display: flex;
+	flex-direction: column;
+	align-items: end;
+	gap: 8px;
+}
+
+.comment__form-box textarea {
+	width: 100%;
+	height: 80px;
+	resize: none;
+	border: none;
+	border-radius: 4px;
+	padding: 8px;
+
+	background: var(--input-color); 
+	outline: 2px solid transparent;
+	transition: 300ms;
+}
+
+.comment__form-box textarea:focus {
+	outline: 2px solid var(--main-color);
+	box-shadow: 0px 0px 10px 8px rgba(60, 179, 217, 0.25);
+	transform: scale(1.02);
+}
+
+.comment__form-box button {
+	width: 160px;
+	height: 36px;
+	font-size: 1.125rem;
+	font-weight: 600;
+
+	color: white;
+	background: var(--main-color);
+
+	border: none;
+	border-radius: 4px;
+	cursor: pointer;
+	
+	transition: 150ms;
+}
+
+.comment__form-box button:hover,
+.comment__form-box button:focus {
+	background: var(--main-darken);
+	transform: scale(1.02);
+}
+
+.comment__form-box button:active {
+	background: var(--main-lighten);
+}
