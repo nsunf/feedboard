@@ -33,10 +33,20 @@ document.body.addEventListener("click", e => {
 	}
 })
 
-function gotoEditPage() {
+function requestPost(path, post_id) {
+	if (path == 'deletepost' && !confirm("really???")) return; 
+	const form = document.createElement("form");
+	const input = document.createElement("input");
 	
-}
-
-function gotoDelete() {
+	form.setAttribute("action", path);
+	form.setAttribute("method", "post");
+	form.style.display = "none";
 	
+	input.setAttribute("name", "post_id");
+	input.value = post_id;
+	
+	form.appendChild(input);
+	document.body.appendChild(form);
+	
+	form.submit();
 }

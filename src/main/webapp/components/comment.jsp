@@ -23,10 +23,10 @@
 					<div class="comment__setting">
 						<i class="setting__icon fa-solid fa-ellipsis"></i>
 						<div class="setting__pop-up">
-							<div class="setting__button setting__button--edit">
+							<%--- <div class="setting__button setting__button--edit">
 								<span>edit</span><i class="fa-solid fa-pen-to-square"></i>
-							</div>
-							<div class="setting__button setting__button-delete">
+							</div> ---%>
+							<div class="setting__button setting__button-delete" onclick="deleteComment('${c.post_id}', '${c.uuid}');">
 								<span>delete</span><i class="fa-solid fa-trash"></i>
 							</div>
 						</div>
@@ -43,11 +43,13 @@
 	</c:forEach>
 	<c:if test="${comments != null}">
 	<div class="comment__form-box">
-		<form name="commentForm" action="" method="post">
-			<textarea maxlength="500" name="comment-text" placeholder="Enter comments"></textarea>
+		<form name="commentForm" action="addcomment" method="post">
+			<input type="hidden" name="post_id" value="${post.uuid}"/>
+			<textarea maxlength="500" name="comment_text" placeholder="Enter comments"></textarea>
 			<button type="submit">COMMENT</button>
 		</form>
 	</div>
 	</c:if>
+	<script src="/FeedBoard/scripts/comment.js"></script>
 </body>
 </html>

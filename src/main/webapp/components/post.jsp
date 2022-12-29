@@ -10,7 +10,7 @@
 </head>
 <body>
 	<c:if test="${empty post}">
-	<c:if test="${posts.size() == 0}">
+	<c:if test="${empty post && posts.size() == 0}">
 		<%-- no post --%>
 		<div class="post no-post">
 			<div class="no-post__wrap">
@@ -32,17 +32,25 @@
 				</div>
 				<div class="post__etc">
 					<span class="post__date">${post.regdate}</span>
-					<div class="post__setting">
-						<i class="setting__icon fa-solid fa-ellipsis"></i>
-						<div class="setting__pop-up">
-							<div class="setting__button setting__button--edit">
-								<span>edit</span><i class="fa-solid fa-pen-to-square"></i>
-							</div>
-							<div class="setting__button setting__button-delete">
-								<span>delete</span><i class="fa-solid fa-trash"></i>
+					<c:choose>
+						<c:when test="${post.member_uuid eq cookie['user_uuid'].getValue()}">
+						<script>alert("${cookie['user_uuid'].getValue()}");</script>
+						<div class="post__setting">
+							<i class="setting__icon fa-solid fa-ellipsis"></i>
+							<div class="setting__pop-up">
+								<div class="setting__button setting__button--edit" onclick="requestPost('editpost', '${post.uuid}')">
+									<span>edit</span><i class="fa-solid fa-pen-to-square"></i>
+								</div>
+								<div class="setting__button setting__button-delete" onclick="requestPost('deletepost', '${post.uuid}')">
+									<span>delete</span><i class="fa-solid fa-trash"></i>
+								</div>
 							</div>
 						</div>
-					</div>
+						</c:when>
+						<c:otherwise>
+						<div class="post__setting--empty"></div>
+						</c:otherwise>
+					</c:choose>
 				</div>
 			</div>
 
@@ -78,7 +86,7 @@
 	</c:if>
 
 	<c:if test="${not empty post}">
-		<%-- post --%>
+		<%-- post detail --%>
 		<div class="post post-detail" data-post_id="${post.uuid}">
 			<div class="post__header">
 				<div class="post__author author">

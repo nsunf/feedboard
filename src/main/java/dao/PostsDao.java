@@ -86,9 +86,13 @@ public class PostsDao extends DAO {
 					+ "p.post_content, "
 					+ "p.post_regdate, "
 					+ "p.post_editdate, "
-					+ "p.likes "
+					+ "p.likes, "
+					+ "count(c.post_id) "
 					+ "from posts_info p "
-					+ "where p.post_id = ?";
+					+ "left join comments c "
+					+ "on p.post_id = c.post_id "
+					+ "group by (p.post_id, p.author_uuid, p.author_id, p.post_content, p.post_regdate, p.post_editdate, p.likes) "
+					+ "having p.post_id = ?";
 			PreparedStatement ps = conn.prepareStatement(sql);
 			ps.setString(1, post_id);
 			ResultSet rs = ps.executeQuery();
@@ -101,6 +105,7 @@ public class PostsDao extends DAO {
 				post.setRegdate(rs.getString(5));
 				post.setEditdate(rs.getString(6));
 				post.setLikes(rs.getInt(7));
+				post.setComments(rs.getInt(8));
 			}
 			
 			sql = "select "
@@ -158,6 +163,43 @@ public class PostsDao extends DAO {
 
 		
 		return result != 0 ? post_uuid : null;
+	}
+	
+	public void updatePost(HttpServletRequest req) {
+		Connection conn = getConnection();
+		
+		String sql = "update posts set post_content = ?, post_regdate = sysdate where post_id = ?";
+		
+		try {
+			PreparedStatement ps = conn.prepareStatement(sql);
+			ps.setString(1, req.getParameter("content"));
+			ps.setString(2, req.getParameter("post_id"));
+			
+			ps.executeUpdate();
+			
+			conn.close();
+			ps.close();
+		} catch(Exception e) {
+			e.printStackTrace();
+		}
+	}
+	
+	public void deletePost(HttpServletRequest req) {
+		Connection conn = getConnection();
+		
+		String sql = "delete from posts where post_id = ?";
+		
+		try {
+			PreparedStatement ps = conn.prepareStatement(sql);
+			ps.setString(1, req.getParameter("post_id"));
+			
+			ps.executeUpdate();
+			
+			conn.close();
+			ps.close();
+		} catch(Exception e) {
+			e.printStackTrace();
+		}
 	}
 }
 

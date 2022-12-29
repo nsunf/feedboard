@@ -49,7 +49,7 @@ public class MainController extends HttpServlet {
 		System.out.println(context + path);
 		System.out.println(isLoggedin(req, resp));
 
-		String view = "index.jsp";
+		String view = "views/index.jsp";
 
 		switch (path) {
 		case "/login":
@@ -70,6 +70,26 @@ public class MainController extends HttpServlet {
 		case "/addpost":
 			view = addPost(req, resp);
 			return;
+		case "/editpost":
+			req.setAttribute("post", pDao.getPost(req.getParameter("post_id")));
+			view = "views/edit.jsp";
+			break;
+		case "/updatepost":
+			pDao.updatePost(req);
+			view = "redirect:/home";
+			break;
+		case "/deletepost":
+			pDao.deletePost(req);
+			view = "redirect:/home";
+			break;
+		case "/addcomment":
+			cDao.addComment(req);
+			view = "redirect:/post?id=" + req.getParameter("post_id");
+			break;
+		case "/deletecomment":
+			cDao.deleteComment(req);
+			view = "redirect:/post?id=" + req.getParameter("post_id");
+			break;
 		case "/home":
 		default:
 			req.setAttribute("posts", pDao.selectAll());
@@ -79,7 +99,7 @@ public class MainController extends HttpServlet {
 		if (view.startsWith("redirect:/")) {
 			resp.sendRedirect(view.substring("redirect:/".length()));
 		} else {
-			getServletContext().getRequestDispatcher("/views/" + view).forward(req, resp);
+			getServletContext().getRequestDispatcher("/" + view).forward(req, resp);
 		}
 	}
 
@@ -97,9 +117,9 @@ public class MainController extends HttpServlet {
 				String key = UUID.randomUUID().toString();
 				session.setAttribute("login_uuid", key);
 				session.setAttribute("user_uuid", user_uuid);
-				Cookie cookie1 = new Cookie("login_uuid", key);
-				cookie1.setMaxAge(60 * 10);
-				resp.addCookie(cookie1);
+				Cookie cookie = new Cookie("login_uuid", key);
+				cookie.setMaxAge(60 * 10);
+				resp.addCookie(cookie);
 			}
 
 			out.println("<script>alert('" + msg + "');location.href='/FeedBoard'</script>");
@@ -121,6 +141,31 @@ public class MainController extends HttpServlet {
 		}
 
 		return "redirect:/home";
+	}
+
+	public boolean isLoggedin(HttpServletRequest req, HttpServletResponse resp) {
+		HttpSession session = req.getSession();
+		String key = (String)session.getAttribute("login_uuid");
+		String cookieKey = null;
+		
+		Cookie[] cookies = req.getCookies();
+		if (cookies == null) return false;
+		Cookie login_uuid_cookie = null;
+		for (Cookie c : cookies) {
+			if (c.getName().equals("login_uuid")) {
+				cookieKey = c.getValue();
+				login_uuid_cookie = c;
+				login_uuid_cookie.setMaxAge(60 * 10);
+			}
+		}
+
+		boolean result = key != null && cookieKey != null && key.equals(cookieKey); 
+		if (result) {
+			String user_uuid = (String) session.getAttribute("user_uuid");
+			req.setAttribute("user", mDao.getMember(user_uuid));
+			resp.addCookie(login_uuid_cookie);
+		}
+		return result;
 	}
 
 	public String signup(HttpServletRequest req, HttpServletResponse resp) { 
@@ -161,7 +206,7 @@ public class MainController extends HttpServlet {
 		ArrayList<Comment> comments = cDao.getComments(postId);
 		req.setAttribute("post", post);
 		req.setAttribute("comments", comments);
-		return "index.jsp";
+		return "views/index.jsp";
 	}
 	
 	public String addPost(HttpServletRequest req, HttpServletResponse resp) {
@@ -177,33 +222,9 @@ public class MainController extends HttpServlet {
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
-		return "index.jsp";
+		return "views/index.jsp";
 	}
 
-	public boolean isLoggedin(HttpServletRequest req, HttpServletResponse resp) {
-		HttpSession session = req.getSession();
-		String key = (String)session.getAttribute("login_uuid");
-		String cookieKey = null;
-		
-		Cookie[] cookies = req.getCookies();
-		if (cookies == null) return false;
-		Cookie login_uuid_cookie = null;
-		for (Cookie c : cookies) {
-			if (c.getName().equals("login_uuid")) {
-				cookieKey = c.getValue();
-				login_uuid_cookie = c;
-				login_uuid_cookie.setMaxAge(60 * 10);
-			}
-		}
-
-		boolean result = key != null && cookieKey != null && key.equals(cookieKey); 
-		if (result) {
-			String user_uuid = (String) session.getAttribute("user_uuid");
-			req.setAttribute("user", mDao.getMember(user_uuid));
-			resp.addCookie(login_uuid_cookie);
-		}
-		return result;
-	}
 
 	public ArrayList<String> saveImages(String post_id, HttpServletRequest req) {
 		ArrayList<String> filenames = new ArrayList<>();

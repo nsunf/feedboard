@@ -4,6 +4,9 @@ import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.util.ArrayList;
+import java.util.UUID;
+
+import javax.servlet.http.HttpServletRequest;
 
 import dto.Comment;
 
@@ -55,5 +58,50 @@ public class CommentsDao extends DAO {
 		}
 		
 		return comments;
+	}
+	
+	public void addComment(HttpServletRequest req) {
+		Connection conn = getConnection();
+		
+		String sql = "insert into comments values(?, ?, ?, ?, default, null)";
+		String comment_id = UUID.randomUUID().toString();
+		String post_id = req.getParameter("post_id");
+		String comment_content = req.getParameter("comment_text");
+		
+		try {
+			String member_id = (String)req.getSession().getAttribute("user_uuid");
+			if (member_id == null) throw new Exception("please login to add comment");
+
+			PreparedStatement ps = conn.prepareStatement(sql);
+			ps.setString(1, comment_id);
+			ps.setString(2, post_id);
+			ps.setString(3, member_id);
+			ps.setString(4, comment_content);
+			
+			ps.executeUpdate();
+			
+			conn.close();
+			ps.close();
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
+	}
+	
+	public void deleteComment(HttpServletRequest req) {
+		Connection conn = getConnection();
+		
+		String sql = "delete from comments where comment_id = ?";
+		
+		try {
+			PreparedStatement ps = conn.prepareStatement(sql);
+			ps.setString(1, req.getParameter("comment_id"));
+			
+			ps.executeUpdate();
+			
+			conn.close();
+			ps.close();
+		} catch(Exception e) {
+			e.printStackTrace();
+		}
 	}
 }
