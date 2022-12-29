@@ -1,13 +1,6 @@
 package controller;
 
-import java.awt.image.BufferedImage;
-import java.io.BufferedOutputStream;
-import java.io.BufferedReader;
-import java.io.File;
-import java.io.FileOutputStream;
 import java.io.IOException;
-import java.io.InputStream;
-import java.io.InputStreamReader;
 import java.io.PrintWriter;
 import java.util.ArrayList;
 import java.util.Collection;
@@ -22,7 +15,6 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
 import javax.servlet.http.Part;
-import javax.xml.bind.DatatypeConverter;
 
 import dao.CommentsDao;
 import dao.ImageDao;
@@ -33,12 +25,21 @@ import dto.Member;
 import dto.Post;
 
 @WebServlet("/")
-@MultipartConfig(maxFileSize = 1024 * 1024 * 10, location = "D:/project/java/FeedBoard/src/main/webapp/public/images")
+@MultipartConfig(maxFileSize = 1024 * 1024 * 10, location = "d:/project/java/FeedBoard/src/main/webapp/public/images")
 public class MainController extends HttpServlet {
-	private MembersDao mDao = new MembersDao();
-	private PostsDao pDao = new PostsDao();
-	private CommentsDao cDao = new CommentsDao();
-	private ImageDao iDao = new ImageDao();
+	private MembersDao mDao = null;
+	private PostsDao pDao = null;
+	private CommentsDao cDao = null;
+	private ImageDao iDao = null;
+	
+	@Override
+	public void init() throws ServletException {
+		mDao = new MembersDao();
+		pDao = new PostsDao();
+		cDao = new CommentsDao();
+		iDao = new ImageDao();
+		super.init();
+	}
 
 	@Override
 	protected void service(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
@@ -235,38 +236,5 @@ public class MainController extends HttpServlet {
 		iDao.addImages(post_id, filenames);
 		
 		return filenames;
-//		String[] base64Arr = req.getParameterValues("base64");
-//		ArrayList<String> filenames = new ArrayList<>();
-//
-//		for (String base64 : base64Arr) {
-//			String ext = base64.split(";")[0].split("/")[1];
-//			String imgStr = base64.split(",")[1];
-//
-//			byte[] imageBytes = DatatypeConverter.parseBase64Binary(imgStr);  
-//
-//			String uuid = UUID.randomUUID().toString();
-//			
-//			try {
-//				File file = new File("D:/project/java/feedboard/src/main/webapp/public/images/" + uuid + "." + ext);
-//				System.out.println(file.getPath());
-//				if (!file.exists()) file.createNewFile();
-//				
-//				FileOutputStream fo = new FileOutputStream(file);
-//				BufferedOutputStream bo = new BufferedOutputStream(fo);
-//				
-//				bo.write(imageBytes);
-//				bo.flush();
-//				bo.close();
-//				fo.close();
-//				
-//				filenames.add(uuid + "." + ext);
-//			} catch (Exception e) {
-//				e.printStackTrace();
-//			}
-//		}
-//		
-//		iDao.addImages(post_id, filenames);
-//		
-//		return filenames;
 	}
 }

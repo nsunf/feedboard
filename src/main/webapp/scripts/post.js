@@ -32,3 +32,11 @@ document.body.addEventListener("click", e => {
 		})
 	}
 })
+
+function gotoEditPage() {
+	
+}
+
+function gotoDelete() {
+	
+}

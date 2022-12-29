@@ -52,7 +52,7 @@
 				<a class="post__link" href="">
 					<div class="image-grid">
 						<c:forEach var="img" items="${post.images}">
-							<img class="post__image" src="/FeedBoard/public/images/${img}"
+							<img class="post__image" src="/images/${img}"
 								alt="" loading="lazy">
 						</c:forEach>
 					</div>
@@ -89,17 +89,24 @@
 				</div>
 				<div class="post__etc">
 					<span class="post__date">${post.regdate}</span>
-					<div class="post__setting">
-						<i class="setting__icon fa-solid fa-ellipsis"></i>
-						<div class="setting__pop-up">
-							<div class="setting__button setting__button--edit">
-								<span>edit</span><i class="fa-solid fa-pen-to-square"></i>
-							</div>
-							<div class="setting__button setting__button-delete">
-								<span>delete</span><i class="fa-solid fa-trash"></i>
+					<c:choose>
+						<c:when test="${post.member_uuid eq user_uuid}">
+						<div class="post__setting">
+							<i class="setting__icon fa-solid fa-ellipsis"></i>
+							<div class="setting__pop-up">
+								<div class="setting__button setting__button--edit">
+									<span>edit</span><i class="fa-solid fa-pen-to-square"></i>
+								</div>
+								<div class="setting__button setting__button-delete">
+									<span>delete</span><i class="fa-solid fa-trash"></i>
+								</div>
 							</div>
 						</div>
-					</div>
+						</c:when>
+						<c:otherwise>
+						<div class="post__setting--empty"></div>
+						</c:otherwise>
+					</c:choose>
 				</div>
 			</div>
 
@@ -108,7 +115,7 @@
 			<div class="post__main">
 				<div class="image-grid">
 					<c:forEach var="img" items="${post.images}">
-						<img class="post__image" src="/FeedBoard/public/images/${img}" alt="" loading="lazy">
+						<img class="post__image" src="/images/${img}" alt="" loading="lazy">
 					</c:forEach>
 				</div>
 				<div class="post__content">
