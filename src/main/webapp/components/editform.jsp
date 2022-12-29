@@ -13,11 +13,11 @@
 			<h2>New Post</h2>
 		</div>
 		<hr class="edit-box__divider"/>
-		<form class="edit-box__main editform" name="editform" action="addpost" method="post">
+		<form class="edit-box__main editform" name="editform" action="addpost" method="post" enctype="multipart/form-data">
 			<label for="images-input" class="editform__image-label">Add Images | 
 				<input class="editform__images" id="images-input" type="file" name="images" accept="image/png, image/jpg, image/jpeg, image/gif" multiple/>
-				<textarea style="display: none;" name="image-base64"></textarea>
 			</label>
+			<p class="editform__img-box"></p>
 			<textarea class="editform__content" name="content" maxlength="1000" required></textarea>
 			<button class="editform__submit-btn" type="submit">POST</button>
 		</form>

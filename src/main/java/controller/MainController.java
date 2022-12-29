@@ -1,22 +1,31 @@
 package controller;
 
+import java.awt.image.BufferedImage;
 import java.io.BufferedOutputStream;
+import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
+import java.io.InputStream;
+import java.io.InputStreamReader;
 import java.io.PrintWriter;
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.UUID;
 
 import javax.servlet.ServletException;
+import javax.servlet.annotation.MultipartConfig;
 import javax.servlet.annotation.WebServlet;
 import javax.servlet.http.Cookie;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
+import javax.servlet.http.Part;
+import javax.xml.bind.DatatypeConverter;
 
 import dao.CommentsDao;
+import dao.ImageDao;
 import dao.MembersDao;
 import dao.PostsDao;
 import dto.Comment;
@@ -24,10 +33,12 @@ import dto.Member;
 import dto.Post;
 
 @WebServlet("/")
+@MultipartConfig(maxFileSize = 1024 * 1024 * 10, location = "D:/project/java/FeedBoard/src/main/webapp/public/images")
 public class MainController extends HttpServlet {
 	private MembersDao mDao = new MembersDao();
 	private PostsDao pDao = new PostsDao();
 	private CommentsDao cDao = new CommentsDao();
+	private ImageDao iDao = new ImageDao();
 
 	@Override
 	protected void service(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
@@ -56,8 +67,7 @@ public class MainController extends HttpServlet {
 			view = "edit.jsp";
 			break;
 		case "/addpost":
-			saveImages(req);
-//			view = addPost(req, resp);
+			view = addPost(req, resp);
 			return;
 		case "/home":
 		default:
@@ -154,15 +164,17 @@ public class MainController extends HttpServlet {
 	}
 	
 	public String addPost(HttpServletRequest req, HttpServletResponse resp) {
-		boolean result = pDao.addPost(req);
+		String post_id = pDao.addPost(req);
+		saveImages(post_id, req);
 		try {
 			PrintWriter out = resp.getWriter();
-			String msg = result ?  "posting succeed" : "posting failed";
+			String msg = post_id != null ?  "posting succeed" : "posting failed";
 
 			out.println("<script>alert('" + msg + "');location.href='/FeedBoard'</script>");
 			out.flush();
 			out.close();
 		} catch (Exception e) {
+			e.printStackTrace();
 		}
 		return "index.jsp";
 	}
@@ -173,6 +185,7 @@ public class MainController extends HttpServlet {
 		String cookieKey = null;
 		
 		Cookie[] cookies = req.getCookies();
+		if (cookies == null) return false;
 		Cookie login_uuid_cookie = null;
 		for (Cookie c : cookies) {
 			if (c.getName().equals("login_uuid")) {
@@ -191,29 +204,69 @@ public class MainController extends HttpServlet {
 		return result;
 	}
 
-	public void saveImages(HttpServletRequest req) {
-		System.out.println(req.getParameter("image-base64"));
-		try { Thread.sleep(5000); } catch (Exception e) { }
-		System.out.println("hehe");
+	public ArrayList<String> saveImages(String post_id, HttpServletRequest req) {
+		ArrayList<String> filenames = new ArrayList<>();
+
+		try {
+			Collection<Part> parts = req.getParts();
+			for (Part p : parts) {
+				String contentDispositionHeader = p.getHeader("content-disposition");
+				if (!p.getName().equals("images")) continue;
+
+				String[] elements = contentDispositionHeader.split(";");
+				String filename = null;
+				for (String el : elements) {
+					if (el.trim().startsWith("filename")) {
+						filename = el.split("=")[1].replace("\"", "");
+						break;
+					}
+				}
+				String[] splittedFileName = filename.split("\\."); 
+				String ext = splittedFileName[splittedFileName.length - 1];
+				String uuid = UUID.randomUUID().toString();
+				String resultFileName = uuid + "." + ext;
+				filenames.add(resultFileName);
+				p.write(resultFileName);
+			}
+		} catch (Exception e) {
+			System.out.println("Fck");
+			e.printStackTrace();
+		}
+		iDao.addImages(post_id, filenames);
+		
+		return filenames;
+//		String[] base64Arr = req.getParameterValues("base64");
+//		ArrayList<String> filenames = new ArrayList<>();
+//
 //		for (String base64 : base64Arr) {
-//			System.out.println("---> " + base64);
 //			String ext = base64.split(";")[0].split("/")[1];
+//			String imgStr = base64.split(",")[1];
+//
+//			byte[] imageBytes = DatatypeConverter.parseBase64Binary(imgStr);  
+//
 //			String uuid = UUID.randomUUID().toString();
-//			File file = new File("public/images/" + uuid + "." + ext);
 //			
 //			try {
+//				File file = new File("D:/project/java/feedboard/src/main/webapp/public/images/" + uuid + "." + ext);
+//				System.out.println(file.getPath());
+//				if (!file.exists()) file.createNewFile();
+//				
 //				FileOutputStream fo = new FileOutputStream(file);
 //				BufferedOutputStream bo = new BufferedOutputStream(fo);
 //				
-//				byte[] bytes = base64.getBytes(); 
-//				
-//				bo.write(bytes);
+//				bo.write(imageBytes);
 //				bo.flush();
 //				bo.close();
 //				fo.close();
+//				
+//				filenames.add(uuid + "." + ext);
 //			} catch (Exception e) {
 //				e.printStackTrace();
 //			}
 //		}
+//		
+//		iDao.addImages(post_id, filenames);
+//		
+//		return filenames;
 	}
 }

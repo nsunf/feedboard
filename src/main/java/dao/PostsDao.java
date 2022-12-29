@@ -132,7 +132,7 @@ public class PostsDao extends DAO {
 		return post;
 	}
 	
-	public boolean addPost(HttpServletRequest req) {
+	public String addPost(HttpServletRequest req) {
 		Connection conn = getConnection();
 		int result = 0;
 		
@@ -156,7 +156,8 @@ public class PostsDao extends DAO {
 			e.printStackTrace();
 		}
 
-		return result != 0;
+		
+		return result != 0 ? post_uuid : null;
 	}
 }
 

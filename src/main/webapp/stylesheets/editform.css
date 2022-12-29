@@ -36,6 +36,19 @@
 	font-weight: 600;
 }
 
+.editform__img-box {
+	display: grid;
+	grid-template-columns: repeat(4, 4fr);
+	grid-gap: 4px;
+	margin-bottom: 8px;
+}
+
+.base64-img {
+	width: 100%;
+	aspect-ratio: 1/1;
+	object-fit:cover;
+}
+
 .editform__images {
 	margin: 16px 0;
 }
