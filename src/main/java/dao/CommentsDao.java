@@ -1,8 +1,5 @@
 package dao;
 
-import java.sql.Connection;
-import java.sql.PreparedStatement;
-import java.sql.ResultSet;
 import java.util.ArrayList;
 import java.util.UUID;
 
@@ -12,7 +9,7 @@ import dto.Comment;
 
 public class CommentsDao extends DAO {
 	public ArrayList<Comment> getComments(String comment_id) { 
-		Connection conn = getConnection();
+		conn = getConnection();
 		ArrayList<Comment> comments = new ArrayList<>();
 		
 		String sql = "select "
@@ -31,9 +28,9 @@ public class CommentsDao extends DAO {
 				+ "on c.member_uuid = m.member_uuid "
 				+ "where p.post_id = ?";
 		try {
-			PreparedStatement ps = conn.prepareStatement(sql);
+			ps = conn.prepareStatement(sql);
 			ps.setString(1, comment_id);
-			ResultSet rs = ps.executeQuery();
+			rs = ps.executeQuery();
 			
 			while (rs.next()) {
 				Comment c = new Comment();
@@ -48,20 +45,18 @@ public class CommentsDao extends DAO {
 				
 				comments.add(c);
 			}
-			
-			conn.close();
-			ps.close();
-			rs.close();
 		} catch (Exception e) {
 			System.out.println("===> CommentsDao.getComments()");
 			e.printStackTrace();
+		} finally {
+			closeAll();
 		}
 		
 		return comments;
 	}
 	
 	public void addComment(HttpServletRequest req) {
-		Connection conn = getConnection();
+		conn = getConnection();
 		
 		String sql = "insert into comments values(?, ?, ?, ?, default, null)";
 		String comment_id = UUID.randomUUID().toString();
@@ -69,39 +64,37 @@ public class CommentsDao extends DAO {
 		String comment_content = req.getParameter("comment_text");
 		
 		try {
-			String member_id = (String)req.getSession().getAttribute("user_uuid");
+			String member_id = (String)req.getAttribute("user_uuid");
 			if (member_id == null) throw new Exception("please login to add comment");
 
-			PreparedStatement ps = conn.prepareStatement(sql);
+			ps = conn.prepareStatement(sql);
 			ps.setString(1, comment_id);
 			ps.setString(2, post_id);
 			ps.setString(3, member_id);
 			ps.setString(4, comment_content);
 			
 			ps.executeUpdate();
-			
-			conn.close();
-			ps.close();
 		} catch (Exception e) {
 			e.printStackTrace();
+		} finally {
+			closeAll();
 		}
 	}
 	
 	public void deleteComment(HttpServletRequest req) {
-		Connection conn = getConnection();
+		conn = getConnection();
 		
 		String sql = "delete from comments where comment_id = ?";
 		
 		try {
-			PreparedStatement ps = conn.prepareStatement(sql);
+			ps = conn.prepareStatement(sql);
 			ps.setString(1, req.getParameter("comment_id"));
 			
 			ps.executeUpdate();
-			
-			conn.close();
-			ps.close();
 		} catch(Exception e) {
 			e.printStackTrace();
+		} finally {
+			closeAll();
 		}
 	}
 }

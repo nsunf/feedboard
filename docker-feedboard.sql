@@ -1,4 +1,4 @@
-drop table member;
+drop table members;
 drop table posts;
 drop table comments;
 drop table images;
@@ -23,8 +23,7 @@ create table posts (
     post_content varchar2(4000),
     post_regdate date default sysdate not null,
     post_editdate date,
-    img_url varchar2(50) 
-    constraint fk_posts_member foreign key (member_uuid) references members(member_uuid)
+    constraint fk_posts_member foreign key (member_uuid) references members(member_uuid) on delete cascade
 );
 
 create table comments (
@@ -34,8 +33,8 @@ create table comments (
     comment_content varchar2(1500),
     comment_regdate date default sysdate not null,
     comment_editdate date,
-    constraint fk_comments_post foreign key (post_id) references posts(post_id),
-    constraint fk_comments_member foreign key (member_uuid) references members(member_uuid)
+    constraint fk_comments_post foreign key (post_id) references posts(post_id) on delete cascade,
+    constraint fk_comments_member foreign key (member_uuid) references members(member_uuid) on delete cascade
 );
 
 create table likes (
@@ -43,8 +42,8 @@ create table likes (
     member_uuid char(36),
     like_regdate date default sysdate not null,
     constraint pk_likes primary key(post_id, member_uuid),
-    constraint fk_likes_posts foreign key (post_id) references posts(post_id),
-    constraint fk_likes_members foreign key (member_uuid) references members(member_uuid)
+    constraint fk_likes_posts foreign key (post_id) references posts(post_id) on delete cascade,
+    constraint fk_likes_members foreign key (member_uuid) references members(member_uuid) on delete cascade
 );
 
 create table images (
@@ -52,7 +51,7 @@ create table images (
     post_id char(36) not null,
     image_order number not null,
     image_ext varchar(7) not null,
-    constraint fk_images_post foreign key (post_id) references posts(post_id)
+    constraint fk_images_post foreign key (post_id) references posts(post_id) on delete cascade
 );
 
 insert into members values (
@@ -259,7 +258,8 @@ select
     a.likes, 
     (select i.image_id||i.image_ext as file_name from posts p left join images i on p.post_id = i.post_id where p.post_id = a.post_id and i.image_order = 1) as img1,
     (select i.image_id||i.image_ext as file_name from posts p left join images i on p.post_id = i.post_id where p.post_id = a.post_id and i.image_order = 2) as img2,
-    count(c.post_id)
+    count(c.post_id),
+    (select l.post_id from likes l where l.post_id = a.post_id and l.member_uuid = 'fe4559b7-aabc-4838-8cc8-324d3bf38c47') as islike
 from posts_info a
 left join comments c 
 on a.post_id = c.post_id
@@ -310,6 +310,11 @@ on p.post_id = c.post_id
 left join members m
 on c.member_uuid = m.member_uuid
 where p.post_id = '770636bc-a1d1-4b30-8144-8b35d290e2f1';
+-- like
+select count(l.post_id)
+from likes l
+where l.post_id = '9642ed0d-86df-4ae2-8b62-63a85525ad18' 
+and l.member_uuid = 'fe4559b7-aabc-4838-8cc8-324d3bf38c47';
 --
 delete from posts;
 delete from comments;

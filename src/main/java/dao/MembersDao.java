@@ -1,9 +1,6 @@
 package dao;
 
 import java.security.MessageDigest;
-import java.sql.Connection;
-import java.sql.PreparedStatement;
-import java.sql.ResultSet;
 
 import javax.xml.bind.DatatypeConverter;
 
@@ -12,7 +9,7 @@ import dto.Member;
 public class MembersDao extends DAO {
 	
 	public String login(String user_id, String user_pw) {
-		Connection conn = getConnection();
+		conn = getConnection();
 		String uuid = null;
 		
 		String sql = "select "
@@ -23,24 +20,25 @@ public class MembersDao extends DAO {
 				+ "where m.member_id = ? and m.member_pw = ? ";
 		
 		try {
-			PreparedStatement ps = conn.prepareStatement(sql);
+			ps = conn.prepareStatement(sql);
 			ps.setString(1, user_id);
 			ps.setString(2, user_pw);
-			ResultSet rs = ps.executeQuery();
+			rs = ps.executeQuery();
 
-			if (rs.next()) {
+			if (rs.next())
 				uuid = rs.getString(1);
-			}
 		} catch (Exception e) {
 			System.out.println("===> MembersDao.login()");
 			e.printStackTrace();
+		} finally {
+			closeAll();
 		}
 
 		return uuid;
 	}
 	
 	public Member getMember(String user_uuid) {
-		Connection conn = getConnection();
+		conn = getConnection();
 		Member member = null;
 		
 		String sql = "select "
@@ -59,9 +57,9 @@ public class MembersDao extends DAO {
 				+ "group by (m.member_uuid, m.member_id, m.member_name, substr(m.member_ssn, 1, 6), m.member_phone, m.member_regdate, m.member_image)";
 		
 		try {
-			PreparedStatement ps = conn.prepareStatement(sql);
+			ps = conn.prepareStatement(sql);
 			ps.setString(1, user_uuid);
-			ResultSet rs = ps.executeQuery();
+			rs = ps.executeQuery();
 
 			if (rs.next()) {
 				member = new Member();
@@ -77,18 +75,20 @@ public class MembersDao extends DAO {
 		} catch (Exception e) {
 			System.out.println("===> MembersDao.login()");
 			e.printStackTrace();
+		} finally {
+			closeAll();
 		}
 
 		return member;
 	}
 	
 	public boolean signUp(Member m) {
-		Connection conn = getConnection();
+		conn = getConnection();
 		int result = 0;
 		
 		String sql = "insert into members values (?, ?, ?, ?, ?, ?, default, null)";
 		try {
-			PreparedStatement ps = conn.prepareStatement(sql);
+			ps = conn.prepareStatement(sql);
 			ps.setString(1, m.getUuid());
 			ps.setString(2, m.getId());
 			ps.setString(3, m.getSsn());
@@ -99,6 +99,8 @@ public class MembersDao extends DAO {
 			result = ps.executeUpdate();
 		} catch (Exception e) {
 			e.printStackTrace();
+		} finally {
+			closeAll();
 		}
 		return result == 1;
 	}

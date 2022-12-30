@@ -14,20 +14,12 @@
 			<%-- Profile --%>
 			<div class="aside__profile">
 				<div class="aside__profile-wrap">
-					<div class="profile__img-wrap">
-						<img class="profile__img"
-							src="https://img.freepik.com/free-photo/portrait-young-beautiful-woman-gesticulating_273609-40467.jpg?w=1380&t=st=1671887930~exp=1671888530~hmac=ddcce059c475a821d7063bfe96cff64c87c20a8696f307333e4d92f905dca9a0"
-							alt="profile-img" loading="lazy"/>
-						<div class="profile__edit">
-							<i class="add-icon fa-solid fa-plus"></i>
-						</div>
-					</div>
-					<div class="profile__info">
+ 					<div class="profile__info">
 						<div class="profile__id">${user.id}</div>
 						<div class="profile__posts-cnt">${user.numOfPost} posts</div>
 					</div>
 					<div class="profile__log-out">
-						<a href="logout">logout</a>
+						<a href="auth/logout">logout</a>
 					</div>
 				</div>
 				<a href="/FeedBoard/newpost"><button class="new-post-btn">New Post</button></a>
@@ -37,7 +29,7 @@
 			<%-- Login --%>
 			<div class="aside__login">
 				<div class="login__text">LOGIN</div>
-				<form class="aside__form" name="loginFrm" action="login"
+				<form class="aside__form" name="loginFrm" action="auth/login"
 					method="post">
 					<div class="form__input-box">
 						<label for="login_user_id">ID</label>
@@ -53,7 +45,7 @@
 			<%-- Sign Up --%>
 			<div class="aside__signup">
 				<div class="signup__text">SIGNUP</div>
-				<form class="aside__form" name="signupFrm" action="signup"
+				<form class="aside__form" name="signupFrm" action="auth/signup"
 					method="post">
 					<div class="form__input-box">
 						<label for="signup_user_id">ID</label>

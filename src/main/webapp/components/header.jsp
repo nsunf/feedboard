@@ -15,15 +15,6 @@
 					<a class="logo__link" href="/FeedBoard">FeedBoard</a>
 				</h1>
 			</div>
-			<div class="header__search search">
-				<form class="search__box" action="search" method="post">
-					<input class="search__input" type="search" placeholder="Search User">
-					<button class="search__btn" type="submit">
-						<i class="search__icon fa-solid fa-magnifying-glass"></i>
-					</button>
-				</form>
-			</div>
-		</div>
 	</header>
 </body>
 </html>

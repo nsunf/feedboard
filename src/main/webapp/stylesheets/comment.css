@@ -28,23 +28,14 @@
 	padding: 0 16px;
 }
 
-.comment__author:hover {
-	text-decoration: underline;
-}
+.comment__author .author__id {
+	padding: 2px 4px;
+	border-radius: 2px;
 
-.comment__author .author__link {
-	display: flex;
-	flex-direction: row;
-	align-items: center;
-	gap: 8px;
-	font-size: 0.9rem;
-}
+	color: white;
+	background: var(--main-color);
 
-.comment__author .author__img {
-	width: 30px;
-	height: 30px;
-	object-fit: cover;
-	border-radius: 50%;
+	font-weight: 500;
 }
 
 .comment__date {
@@ -113,6 +104,10 @@
 
 .comment__content {
 	padding-left: 32px;
+}
+
+.comment__content p {
+	white-space: break-spaces;
 }
 
 .comment__form-box form {

@@ -1,8 +1,5 @@
 package dao;
 
-import java.sql.Connection;
-import java.sql.PreparedStatement;
-import java.sql.ResultSet;
 import java.util.ArrayList;
 import java.util.UUID;
 
@@ -12,29 +9,52 @@ import dto.Post;
 
 public class PostsDao extends DAO {
 	
-	public ArrayList<Post> selectAll() {
-		Connection conn = getConnection();
+	public ArrayList<Post> selectAll(String user_uuid) {
+		conn = getConnection();
 		ArrayList<Post> list = new ArrayList<>();
+		String sql = "";
+		if (user_uuid == null) {
+			sql = "select "
+				+ "a.post_id, "
+				+ "a.author_uuid, "
+				+ "a.author_id, "
+				+ "a.post_content, "
+				+ "a.post_regdate, "
+				+ "a.post_editdate, "
+				+ "a.likes, "
+				+ "(select i.image_id||i.image_ext as file_name from posts p left join images i on p.post_id = i.post_id where p.post_id = a.post_id and i.image_order = 1) as img1, "
+				+ "(select i.image_id||i.image_ext as file_name from posts p left join images i on p.post_id = i.post_id where p.post_id = a.post_id and i.image_order = 2) as img2, "
+				+ "count(c.post_id) "
+				+ "from posts_info a "
+				+ "left join comments c "
+				+ "on a.post_id = c.post_id "
+				+ "group by (a.post_id, a.author_uuid, a.author_id, a.post_content, a.post_regdate, a.post_editdate, a.likes) "
+				+ "order by a.post_regdate desc";
+		} else {
+			sql = "select "
+				+ "a.post_id, "
+				+ "a.author_uuid, "
+				+ "a.author_id, "
+				+ "a.post_content, "
+				+ "a.post_regdate, "
+				+ "a.post_editdate, "
+				+ "a.likes, "
+				+ "(select i.image_id||i.image_ext as file_name from posts p left join images i on p.post_id = i.post_id where p.post_id = a.post_id and i.image_order = 1) as img1, "
+				+ "(select i.image_id||i.image_ext as file_name from posts p left join images i on p.post_id = i.post_id where p.post_id = a.post_id and i.image_order = 2) as img2, "
+				+ "count(c.post_id), "
+				+ "(select count(l.post_id) from likes l where l.post_id = a.post_id and l.member_uuid = ?) as islike "
+				+ "from posts_info a "
+				+ "left join comments c "
+				+ "on a.post_id = c.post_id "
+				+ "group by (a.post_id, a.author_uuid, a.author_id, a.post_content, a.post_regdate, a.post_editdate, a.likes) "
+				+ "order by a.post_regdate desc";
+		}
+
 		
 		try {
-			String sql = "select "
-					+ "a.post_id, "
-					+ "a.author_uuid, "
-					+ "a.author_id, "
-					+ "a.post_content, "
-					+ "a.post_regdate, "
-					+ "a.post_editdate, "
-					+ "a.likes, "
-					+ "(select i.image_id||i.image_ext as file_name from posts p left join images i on p.post_id = i.post_id where p.post_id = a.post_id and i.image_order = 1) as img1, "
-					+ "(select i.image_id||i.image_ext as file_name from posts p left join images i on p.post_id = i.post_id where p.post_id = a.post_id and i.image_order = 2) as img2, "
-					+ "count(c.post_id) "
-					+ "from posts_info a "
-					+ "left join comments c "
-					+ "on a.post_id = c.post_id "
-					+ "group by (a.post_id, a.author_uuid, a.author_id, a.post_content, a.post_regdate, a.post_editdate, a.likes) "
-					+ "order by a.post_regdate desc";
-			PreparedStatement ps = conn.prepareStatement(sql);
-			ResultSet rs = ps.executeQuery();
+			ps = conn.prepareStatement(sql);
+			if (user_uuid != null) ps.setString(1, user_uuid);
+			rs = ps.executeQuery();
 			
 			while (rs.next()) {
 				Post post = new Post();
@@ -59,27 +79,27 @@ public class PostsDao extends DAO {
 				post.setLikes(likes);
 				post.setComments(comments);
 				post.setImages(images);
-				
+				if (user_uuid != null) post.setLiked(rs.getInt(11) != 0);
 				list.add(post);
 			}
 			
-			conn.close();
-			ps.close();
-			rs.close();
 		} catch (Exception e) {
 			System.out.println("===> PostsDao.selectAll()");
 			e.printStackTrace();
+		} finally {
+			closeAll();
 		}
 
 		return list;
 	}
 	
-	public Post getPost(String post_id) {
-		Connection conn = getConnection();
+	public Post getPost(String post_id, String user_uuid) {
+		conn = getConnection();
 		Post post = new Post();
+		String sql = "";
 		
-		try {
-			String sql = "select "
+		if (user_uuid == null) {
+			sql = "select "
 					+ "p.post_id, "
 					+ "p.author_uuid, "
 					+ "p.author_id, "
@@ -93,9 +113,33 @@ public class PostsDao extends DAO {
 					+ "on p.post_id = c.post_id "
 					+ "group by (p.post_id, p.author_uuid, p.author_id, p.post_content, p.post_regdate, p.post_editdate, p.likes) "
 					+ "having p.post_id = ?";
-			PreparedStatement ps = conn.prepareStatement(sql);
-			ps.setString(1, post_id);
-			ResultSet rs = ps.executeQuery();
+		} else {
+			sql = "select "
+					+ "p.post_id, "
+					+ "p.author_uuid, "
+					+ "p.author_id, "
+					+ "p.post_content, "
+					+ "p.post_regdate, "
+					+ "p.post_editdate, "
+					+ "p.likes, "
+					+ "count(c.post_id), "
+					+ "(select count(l.post_id) from likes l where l.post_id = p.post_id and l.member_uuid = ?) as islike "
+					+ "from posts_info p "
+					+ "left join comments c "
+					+ "on p.post_id = c.post_id "
+					+ "group by (p.post_id, p.author_uuid, p.author_id, p.post_content, p.post_regdate, p.post_editdate, p.likes) "
+					+ "having p.post_id = ?";
+		}
+		
+		try {
+			ps = conn.prepareStatement(sql);
+			if (user_uuid == null) {
+				ps.setString(1, post_id);
+			} else {
+				ps.setString(1, user_uuid);
+				ps.setString(2, post_id);
+			}
+			rs = ps.executeQuery();
 			
 			if (rs.next()) {
 				post.setUuid(rs.getString(1));
@@ -106,6 +150,7 @@ public class PostsDao extends DAO {
 				post.setEditdate(rs.getString(6));
 				post.setLikes(rs.getInt(7));
 				post.setComments(rs.getInt(8));
+				if (user_uuid != null) post.setLiked(rs.getInt(9) != 0);
 			}
 			
 			sql = "select "
@@ -124,31 +169,29 @@ public class PostsDao extends DAO {
 				images.add(rs.getString(1));
 			}
 			post.setImages(images);
-			System.out.println("img count - " + images.size());
-			
-			conn.close();
-			ps.close();
-			rs.close();
 		} catch (Exception e) {
 			System.out.println("PostDao.getPost()");
 			e.printStackTrace();
+		} finally {
+			closeAll();
 		}
 		
+		System.out.println(post.getMember_uuid());
 		return post;
 	}
 	
 	public String addPost(HttpServletRequest req) {
-		Connection conn = getConnection();
+		conn = getConnection();
 		int result = 0;
 		
 		String post_uuid = UUID.randomUUID().toString();
-		String member_uuid = (String)req.getSession().getAttribute("user_uuid");
+		String member_uuid = (String)req.getAttribute("user_uuid");
 		String post_content = req.getParameter("content");
 		
 		String sql = "insert into posts values (?, ?, ?, default, null)";
 		
 		try {
-			PreparedStatement ps = conn.prepareStatement(sql);
+			ps = conn.prepareStatement(sql);
 			ps.setString(1, post_uuid);
 			ps.setString(2, member_uuid);
 			ps.setString(3, post_content);
@@ -159,6 +202,8 @@ public class PostsDao extends DAO {
 		} catch (Exception e) {
 			System.out.println("===> PostsDao.addPost()");
 			e.printStackTrace();
+		} finally {
+			closeAll();
 		}
 
 		
@@ -166,39 +211,37 @@ public class PostsDao extends DAO {
 	}
 	
 	public void updatePost(HttpServletRequest req) {
-		Connection conn = getConnection();
+		conn = getConnection();
 		
 		String sql = "update posts set post_content = ?, post_regdate = sysdate where post_id = ?";
 		
 		try {
-			PreparedStatement ps = conn.prepareStatement(sql);
+			ps = conn.prepareStatement(sql);
 			ps.setString(1, req.getParameter("content"));
 			ps.setString(2, req.getParameter("post_id"));
 			
 			ps.executeUpdate();
-			
-			conn.close();
-			ps.close();
 		} catch(Exception e) {
 			e.printStackTrace();
+		} finally {
+			closeAll();
 		}
 	}
 	
 	public void deletePost(HttpServletRequest req) {
-		Connection conn = getConnection();
+		conn = getConnection();
 		
 		String sql = "delete from posts where post_id = ?";
 		
 		try {
-			PreparedStatement ps = conn.prepareStatement(sql);
+			ps = conn.prepareStatement(sql);
 			ps.setString(1, req.getParameter("post_id"));
 			
 			ps.executeUpdate();
-			
-			conn.close();
-			ps.close();
 		} catch(Exception e) {
 			e.printStackTrace();
+		} finally {
+			closeAll();
 		}
 	}
 }

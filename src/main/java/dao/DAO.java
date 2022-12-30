@@ -6,9 +6,9 @@ import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 
 public class DAO {
-	private static Connection conn = null;
-	private static PreparedStatement ps = null;
-	private static ResultSet rs = null;
+	protected static Connection conn = null;
+	protected static PreparedStatement ps = null;
+	protected static ResultSet rs = null;
 	
 	public static Connection getConnection() {
 		try {
@@ -21,5 +21,15 @@ public class DAO {
 		}
 		
 		return conn;
+	}
+	
+	public static void closeAll() {
+		try {
+			if (conn != null) conn.close();
+			if (ps != null) ps.close();
+			if (rs != null) rs.close();
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
 	}
 }

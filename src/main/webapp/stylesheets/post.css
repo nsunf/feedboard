@@ -51,23 +51,18 @@
 	padding: 8px 16px;
 }
 
-.post__author:hover {
-	text-decoration: underline;
+.post__author .author__id {
+	padding: 4px 8px;
+	border-radius: 4px;
+	
+	color: white;
+	background: var(--main-color);
+
+	font-size: 1.2rem;
+	font-weight: 600;
 }
 
-.post__author .author__link {
-	display: flex;
-	flex-direction: row;
-	align-items: center;
-	gap: 8px;
-}
 
-.post__author .author__img {
-	width: 40px;
-	height: 40px;
-	object-fit: cover;
-	border-radius: 50%;
-}
 
 .post__etc {
 	/*overflow: hidden;*/
@@ -155,6 +150,9 @@
 .post__content {
 	padding: 8px 0;
 }
+.post__content p {
+	white-space: break-spaces;
+}
 
 .post__footer {
 	overflow: hidden;
@@ -163,16 +161,26 @@
 
 .post__likes {
 	float: left;
+	cursor: pointer;
+	transition: 300ms;
+}
+
+.post__likes:hover {
+	transform: scale(1.25);
+}
+
+.post__likes:hover .likes__btn {
+	color: red;
 }
 
 .likes__btn {
-	
+	transition: 300ms;
 }
 
-.likes__btn--none {
+/* .likes__btn--none {
 	display: none;
 }
-
+ */
 .likes__btn--selected {
 	color: #FF4B4B;
 }

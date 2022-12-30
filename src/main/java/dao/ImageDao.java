@@ -1,13 +1,11 @@
 package dao;
 
-import java.sql.Connection;
-import java.sql.PreparedStatement;
 import java.util.ArrayList;
 
 public class ImageDao extends DAO {
 	public void addImages(String post_id, ArrayList<String> images) {
-		Connection conn = getConnection();
-		PreparedStatement ps = null;
+		conn = getConnection();
+		ps = null;
 
 		try {
 			for (int i = 0; i < images.size(); i++) {
@@ -25,12 +23,10 @@ public class ImageDao extends DAO {
 
 				ps.executeUpdate();
 			}
-
-			conn.close();
-			ps.close();
 		} catch (Exception e) {
 			e.printStackTrace();
+		} finally {
+			closeAll();
 		}
-
 	}
 }

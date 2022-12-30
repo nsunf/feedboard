@@ -50,3 +50,25 @@ function requestPost(path, post_id) {
 	
 	form.submit();
 }
+
+function toggleLike(post_id, on) {
+	const form = document.createElement("form");
+	const postIdInput = document.createElement("input");
+	const onInput = document.createElement("input");
+	
+	form.setAttribute("action", "like");
+	form.setAttribute("method", "post");
+	form.style.display = "none";
+	
+	postIdInput.setAttribute("name", "post_id");
+	postIdInput.value = post_id;
+	
+	onInput.setAttribute("name", "on");
+	onInput.value = on ? 1 : 0;
+	
+	form.appendChild(postIdInput);
+	form.appendChild(onInput);
+	document.body.appendChild(form);
+	
+	form.submit();
+}

@@ -12,6 +12,7 @@ public class Post {
 	private int likes;
 	private int comments;
 	private ArrayList<String> images;
+	private boolean liked;
 
 	
 	public String getUuid() {
@@ -67,5 +68,11 @@ public class Post {
 	}
 	public void setImages(ArrayList<String> images) {
 		this.images = images;
+	}
+	public boolean isLiked() {
+		return liked;
+	}
+	public void setLiked(boolean liked) {
+		this.liked = liked;
 	}
 }
