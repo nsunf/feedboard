@@ -50,27 +50,14 @@ public class MainController extends HttpServlet {
 		String context = req.getContextPath();
 		String path = req.getServletPath();
 
-		System.out.println(context + path);
+		System.out.println("MainController : " + context + path);
 		loginCheck(req, resp);
 
-		Object attr = req.getAttribute("user_uuid");
-		String user_uuid = attr == null ? null : (String)attr;
-		System.out.println("maincon ---> " + user_uuid);
-
-		String view = "views/index.jsp";
+		String view = null;
 
 		switch (path) {
-		case "/login":
-			login(req, resp);
-			return;
-		case "/logout":
-			view = logout(req, resp);
-			break;
-		case "/signup":
-			view = signup(req, resp);
-			return;
 		case "/post":
-			view = postInfo(user_uuid, req);
+			view = postInfo(req);
 			break;
 		case "/newpost":
 			view = "views/edit.jsp";
@@ -79,32 +66,26 @@ public class MainController extends HttpServlet {
 			view = addPost(req, resp);
 			return;
 		case "/editpost":
-			req.setAttribute("post", pDao.getPost(req.getParameter("post_id"), user_uuid));
-			view = "views/edit.jsp";
+			view = editPost(req);
 			break;
 		case "/updatepost":
-			pDao.updatePost(req);
-			view = "redirect:/home";
+			view = updatePost(req);
 			break;
 		case "/deletepost":
-			pDao.deletePost(req);
-			view = "redirect:/home";
+			view = deletePost(req);
 			break;
 		case "/addcomment":
-			cDao.addComment(req);
-			view = "redirect:/post?id=" + req.getParameter("post_id");
+			view = addComment(req);
 			break;
 		case "/deletecomment":
-			cDao.deleteComment(req);
-			view = "redirect:/post?id=" + req.getParameter("post_id");
+			view = deleteComment(req);
 			break;
 		case "/like":
-			lDao.toggleLike(req);
-			view = "redirect:/post?id=" + req.getParameter("post_id");
+			view = toggleLike(req);
 			break;
 		case "/home":
 		default:
-			req.setAttribute("posts", pDao.selectAll(user_uuid));
+			view = getAllPosts(req);
 			break;
 		}
 
@@ -114,45 +95,11 @@ public class MainController extends HttpServlet {
 			getServletContext().getRequestDispatcher("/" + view).forward(req, resp);
 		}
 	}
-
-	public void login(HttpServletRequest req, HttpServletResponse resp) {
-		String user_id = req.getParameter("user_id");
-		String user_pw = req.getParameter("user_pw");
-		String user_uuid = mDao.login(user_id, user_pw);
-
-		try {
-			PrintWriter out = resp.getWriter();
-			String msg = "login failed";
-			if (user_uuid != null) {
-				msg = "login succeed";
-				req.setAttribute("user_uuid", user_uuid);
-				HttpSession session = req.getSession();
-				String sessionId = session.getId();
-				session.setAttribute(sessionId, user_uuid);
-				Cookie cookie = new Cookie("sessionId", sessionId);
-				cookie.setMaxAge(60 * 10);
-				resp.addCookie(cookie);
-			}
-
-			out.println("<script>alert('" + msg + "');location.href='/FeedBoard'</script>");
-			out.flush();
-			out.close();
-		} catch (Exception e) {
-			e.printStackTrace();
-		}
-	}
-
-	public String logout(HttpServletRequest req, HttpServletResponse resp) {
-		Cookie[] cookies = req.getCookies();
-		for (Cookie c : cookies) {
-			if (c.getName().equals("sessionId")) {
-				c.setMaxAge(0);
-				resp.addCookie(c);
-				break;
-			}
-		}
-
-		return "redirect:/home";
+	
+	public String getUserUUID(HttpServletRequest req) {
+		Object attr = req.getAttribute("user_uuid");
+		String userUUID = attr == null ? null : (String)attr;
+		return userUUID;
 	}
 
 	public void loginCheck(HttpServletRequest req, HttpServletResponse resp) {
@@ -162,62 +109,40 @@ public class MainController extends HttpServlet {
 
 		Cookie[] cookies = req.getCookies();
 		if (cookies == null) return;
-
 		for (Cookie c : cookies) {
 			if (c.getName().equals("sessionId") && sessionId.equals(c.getValue())) {
 				String user_uuid = (String) session.getAttribute(sessionId);
 				req.setAttribute("user_uuid", user_uuid);
 				req.setAttribute("user", mDao.getMember(user_uuid));
+				c.setPath("/");
 				c.setMaxAge(60 * 10);
 				resp.addCookie(c);
 				break;
 			}
 		}
 	}
-
-	public String signup(HttpServletRequest req, HttpServletResponse resp) {
-		Member m = new Member();
-		String user_id = req.getParameter("user_id");
-		String user_pw = req.getParameter("user_pw");
-		String user_name = req.getParameter("user_name");
-		String user_ssn = req.getParameter("user_ssn").replace("-", "");
-		String user_phone = req.getParameter("user_phone");
-		m.setUuid(UUID.randomUUID().toString());
-		m.setId(user_id);
-		m.setPw(user_pw);
-		m.setName(user_name);
-		m.setSsn(user_ssn);
-		m.setPhone(user_phone);
-
-		boolean result = mDao.signUp(m);
-
-		try {
-			PrintWriter out = resp.getWriter();
-			String msg = "signup failed";
-			if (result) {
-				msg = "signup succeed";
-			}
-			out.println("<script>alert('" + msg + "');location.href='/FeedBoard'</script>");
-			out.flush();
-			out.close();
-		} catch (Exception e) {
-			e.printStackTrace();
-		}
-
-		return "redirect:/home";
+	
+	public String getAllPosts(HttpServletRequest req) {
+		String userUUID = getUserUUID(req);
+		ArrayList<Post> posts = pDao.selectAll(userUUID);
+		req.setAttribute("posts", posts);
+		return "views/index.jsp";
 	}
 
-	public String postInfo(String user_uuid, HttpServletRequest req) {
-		String postId = req.getParameter("id");
-		Post post = pDao.getPost(postId, user_uuid);
-		ArrayList<Comment> comments = cDao.getComments(postId);
+	public String postInfo(HttpServletRequest req) {
+		String userUUID = getUserUUID(req);
+		String postUUID = req.getParameter("id");
+		Post post = pDao.getPost(postUUID, userUUID);
+		ArrayList<Comment> comments = cDao.getComments(postUUID);
 		req.setAttribute("post", post);
 		req.setAttribute("comments", comments);
 		return "views/index.jsp";
 	}
 
 	public String addPost(HttpServletRequest req, HttpServletResponse resp) {
-		String post_id = pDao.addPost(req);
+		String userUUID = getUserUUID(req);
+		String content = req.getParameter("post_content");
+		String post_id = pDao.addPost(userUUID, content);
 		saveImages(post_id, req);
 		try {
 			PrintWriter out = resp.getWriter();
@@ -231,16 +156,66 @@ public class MainController extends HttpServlet {
 		}
 		return "views/index.jsp";
 	}
+	
+	public String editPost(HttpServletRequest req) {
+		String userUUID = getUserUUID(req);
+		String postUUID = req.getParameter("post_uuid");
+		Post post = pDao.getPost(postUUID, userUUID);
+		req.setAttribute("post", post);
+		return "views/edit.jsp";
+	}
+	
+	public String updatePost(HttpServletRequest req) {
+		String content = req.getParameter("post_content");
+		String postUUID = req.getParameter("post_uuid");
+		
+		pDao.updatePost(content, postUUID);
+		
+		return "redirect:/home";
+	}
+	
+	public String deletePost(HttpServletRequest req) {
+		String postUUID = req.getParameter("post_uuid");
+		pDao.deletePost(postUUID);
+		
+		return "redirect:/home";
+	}
+	
+	public String addComment(HttpServletRequest req) {
+		String postUUID = req.getParameter("post_uuid");
+		String userUUID = getUserUUID(req);
+		String content = req.getParameter("comment_content"); 
+		
+		cDao.addComment(postUUID, userUUID, content);
+		return "redirect:/post?id=" + postUUID;
+	}
+	
+	public String deleteComment(HttpServletRequest req) {
+		String postUUID = req.getParameter("post_id");
+		String commentUUID = req.getParameter("comment_id");
+		cDao.deleteComment(commentUUID);
+		
+		return "redirect:/post?id=" + postUUID;
+	}
+	
+	public String toggleLike(HttpServletRequest req) {
+		String postUUID = req.getParameter("post_uuid");
+		String userUUID = getUserUUID(req);
+		boolean on = req.getParameter("on").equals("1");
+		lDao.toggleLike(postUUID, userUUID, on);
+		
+		return "redirect:/post?id=" + postUUID;
+	}
 
-	public ArrayList<String> saveImages(String post_id, HttpServletRequest req) {
+	public ArrayList<String> saveImages(String postUUID, HttpServletRequest req) {
 		ArrayList<String> filenames = new ArrayList<>();
 
 		try {
 			Collection<Part> parts = req.getParts();
 			for (Part p : parts) {
-				String contentDispositionHeader = p.getHeader("content-disposition");
 				if (!p.getName().equals("images"))
 					continue;
+				String contentDispositionHeader = p.getHeader("content-disposition");
 
 				String[] elements = contentDispositionHeader.split(";");
 				String filename = null;
@@ -250,6 +225,7 @@ public class MainController extends HttpServlet {
 						break;
 					}
 				}
+				if (filename.equals("")) return filenames;
 				String[] splittedFileName = filename.split("\\.");
 				String ext = splittedFileName[splittedFileName.length - 1];
 				String uuid = UUID.randomUUID().toString();
@@ -261,7 +237,7 @@ public class MainController extends HttpServlet {
 			System.out.println("Fck");
 			e.printStackTrace();
 		}
-		iDao.addImages(post_id, filenames);
+		iDao.addImages(postUUID, filenames);
 
 		return filenames;
 	}

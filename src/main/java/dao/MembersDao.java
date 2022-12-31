@@ -37,7 +37,7 @@ public class MembersDao extends DAO {
 		return uuid;
 	}
 	
-	public Member getMember(String user_uuid) {
+	public Member getMember(String userUUID) {
 		conn = getConnection();
 		Member member = null;
 		
@@ -58,7 +58,7 @@ public class MembersDao extends DAO {
 		
 		try {
 			ps = conn.prepareStatement(sql);
-			ps.setString(1, user_uuid);
+			ps.setString(1, userUUID);
 			rs = ps.executeQuery();
 
 			if (rs.next()) {

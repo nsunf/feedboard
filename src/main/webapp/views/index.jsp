@@ -14,7 +14,7 @@
     <%@ include file="../components/header.jsp" %>
     <section>
     	<main class="main">
-			<%@ include file="../components/post.jsp" %>
+			<%@ include file="../components/postList.jsp" %>
 			<%@ include file="../components/comment.jsp" %>
     	</main>
     	<aside class="aside">

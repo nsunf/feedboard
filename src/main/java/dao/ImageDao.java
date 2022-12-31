@@ -3,7 +3,7 @@ package dao;
 import java.util.ArrayList;
 
 public class ImageDao extends DAO {
-	public void addImages(String post_id, ArrayList<String> images) {
+	public void addImages(String postUUID, ArrayList<String> images) {
 		conn = getConnection();
 		ps = null;
 
@@ -17,7 +17,7 @@ public class ImageDao extends DAO {
 
 				ps = conn.prepareStatement(sql);
 				ps.setString(1, filename);
-				ps.setString(2, post_id);
+				ps.setString(2, postUUID);
 				ps.setInt(3, i + 1);
 				ps.setString(4, ext);
 

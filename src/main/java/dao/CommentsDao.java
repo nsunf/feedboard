@@ -8,7 +8,7 @@ import javax.servlet.http.HttpServletRequest;
 import dto.Comment;
 
 public class CommentsDao extends DAO {
-	public ArrayList<Comment> getComments(String comment_id) { 
+	public ArrayList<Comment> getComments(String commentUUID) { 
 		conn = getConnection();
 		ArrayList<Comment> comments = new ArrayList<>();
 		
@@ -29,7 +29,7 @@ public class CommentsDao extends DAO {
 				+ "where p.post_id = ?";
 		try {
 			ps = conn.prepareStatement(sql);
-			ps.setString(1, comment_id);
+			ps.setString(1, commentUUID);
 			rs = ps.executeQuery();
 			
 			while (rs.next()) {
@@ -55,23 +55,20 @@ public class CommentsDao extends DAO {
 		return comments;
 	}
 	
-	public void addComment(HttpServletRequest req) {
+	public void addComment(String postUUID, String memberUUID, String content) {
 		conn = getConnection();
 		
 		String sql = "insert into comments values(?, ?, ?, ?, default, null)";
 		String comment_id = UUID.randomUUID().toString();
-		String post_id = req.getParameter("post_id");
-		String comment_content = req.getParameter("comment_text");
 		
 		try {
-			String member_id = (String)req.getAttribute("user_uuid");
-			if (member_id == null) throw new Exception("please login to add comment");
+			if (memberUUID == null) throw new Exception("please login to add comment");
 
 			ps = conn.prepareStatement(sql);
 			ps.setString(1, comment_id);
-			ps.setString(2, post_id);
-			ps.setString(3, member_id);
-			ps.setString(4, comment_content);
+			ps.setString(2, postUUID);
+			ps.setString(3, memberUUID);
+			ps.setString(4, content);
 			
 			ps.executeUpdate();
 		} catch (Exception e) {
@@ -81,14 +78,14 @@ public class CommentsDao extends DAO {
 		}
 	}
 	
-	public void deleteComment(HttpServletRequest req) {
+	public void deleteComment(String commentUUID) {
 		conn = getConnection();
 		
 		String sql = "delete from comments where comment_id = ?";
 		
 		try {
 			ps = conn.prepareStatement(sql);
-			ps.setString(1, req.getParameter("comment_id"));
+			ps.setString(1, commentUUID);
 			
 			ps.executeUpdate();
 		} catch(Exception e) {

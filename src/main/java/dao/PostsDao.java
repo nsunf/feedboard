@@ -9,11 +9,11 @@ import dto.Post;
 
 public class PostsDao extends DAO {
 	
-	public ArrayList<Post> selectAll(String user_uuid) {
+	public ArrayList<Post> selectAll(String userUUID) {
 		conn = getConnection();
 		ArrayList<Post> list = new ArrayList<>();
 		String sql = "";
-		if (user_uuid == null) {
+		if (userUUID == null) {
 			sql = "select "
 				+ "a.post_id, "
 				+ "a.author_uuid, "
@@ -53,7 +53,7 @@ public class PostsDao extends DAO {
 		
 		try {
 			ps = conn.prepareStatement(sql);
-			if (user_uuid != null) ps.setString(1, user_uuid);
+			if (userUUID != null) ps.setString(1, userUUID);
 			rs = ps.executeQuery();
 			
 			while (rs.next()) {
@@ -79,7 +79,7 @@ public class PostsDao extends DAO {
 				post.setLikes(likes);
 				post.setComments(comments);
 				post.setImages(images);
-				if (user_uuid != null) post.setLiked(rs.getInt(11) != 0);
+				if (userUUID != null) post.setLiked(rs.getInt(11) != 0);
 				list.add(post);
 			}
 			
@@ -93,12 +93,12 @@ public class PostsDao extends DAO {
 		return list;
 	}
 	
-	public Post getPost(String post_id, String user_uuid) {
+	public Post getPost(String postUUID, String userUUID) {
 		conn = getConnection();
 		Post post = new Post();
 		String sql = "";
 		
-		if (user_uuid == null) {
+		if (userUUID == null) {
 			sql = "select "
 					+ "p.post_id, "
 					+ "p.author_uuid, "
@@ -133,11 +133,11 @@ public class PostsDao extends DAO {
 		
 		try {
 			ps = conn.prepareStatement(sql);
-			if (user_uuid == null) {
-				ps.setString(1, post_id);
+			if (userUUID == null) {
+				ps.setString(1, postUUID);
 			} else {
-				ps.setString(1, user_uuid);
-				ps.setString(2, post_id);
+				ps.setString(1, userUUID);
+				ps.setString(2, postUUID);
 			}
 			rs = ps.executeQuery();
 			
@@ -150,7 +150,7 @@ public class PostsDao extends DAO {
 				post.setEditdate(rs.getString(6));
 				post.setLikes(rs.getInt(7));
 				post.setComments(rs.getInt(8));
-				if (user_uuid != null) post.setLiked(rs.getInt(9) != 0);
+				if (userUUID != null) post.setLiked(rs.getInt(9) != 0);
 			}
 			
 			sql = "select "
@@ -161,7 +161,7 @@ public class PostsDao extends DAO {
 					+ "where p.post_id = ? "
 					+ "order by i.image_order";
 			ps = conn.prepareStatement(sql);
-			ps.setString(1, post_id);
+			ps.setString(1, postUUID);
 			rs = ps.executeQuery();
 			
 			ArrayList<String> images = new ArrayList<>();
@@ -180,21 +180,19 @@ public class PostsDao extends DAO {
 		return post;
 	}
 	
-	public String addPost(HttpServletRequest req) {
+	public String addPost(String userUUID, String content) {
 		conn = getConnection();
 		int result = 0;
 		
-		String post_uuid = UUID.randomUUID().toString();
-		String member_uuid = (String)req.getAttribute("user_uuid");
-		String post_content = req.getParameter("content");
+		String postUUID = UUID.randomUUID().toString();
 		
 		String sql = "insert into posts values (?, ?, ?, default, null)";
 		
 		try {
 			ps = conn.prepareStatement(sql);
-			ps.setString(1, post_uuid);
-			ps.setString(2, member_uuid);
-			ps.setString(3, post_content);
+			ps.setString(1, postUUID);
+			ps.setString(2, userUUID);
+			ps.setString(3, content);
 			result = ps.executeUpdate();
 
 			conn.close();
@@ -207,18 +205,18 @@ public class PostsDao extends DAO {
 		}
 
 		
-		return result != 0 ? post_uuid : null;
+		return result != 0 ? postUUID : null;
 	}
 	
-	public void updatePost(HttpServletRequest req) {
+	public void updatePost(String content, String postUUID) {
 		conn = getConnection();
 		
 		String sql = "update posts set post_content = ?, post_regdate = sysdate where post_id = ?";
 		
 		try {
 			ps = conn.prepareStatement(sql);
-			ps.setString(1, req.getParameter("content"));
-			ps.setString(2, req.getParameter("post_id"));
+			ps.setString(1, content);
+			ps.setString(2, postUUID);
 			
 			ps.executeUpdate();
 		} catch(Exception e) {
@@ -228,14 +226,14 @@ public class PostsDao extends DAO {
 		}
 	}
 	
-	public void deletePost(HttpServletRequest req) {
+	public void deletePost(String postUUID) {
 		conn = getConnection();
 		
 		String sql = "delete from posts where post_id = ?";
 		
 		try {
 			ps = conn.prepareStatement(sql);
-			ps.setString(1, req.getParameter("post_id"));
+			ps.setString(1, postUUID);
 			
 			ps.executeUpdate();
 		} catch(Exception e) {
